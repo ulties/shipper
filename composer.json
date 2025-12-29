@@ -26,7 +26,10 @@
         }
     },
     "scripts": {
-        "test": "echo 'Pest testing requires dev dependencies. Install with: composer install'",
+        "test": [
+            "@php -r \"file_exists('vendor/bin/pest') ? exit(0) : exit(1);\" || echo 'Dev dependencies required. Run: composer install'",
+            "@php -r \"file_exists('vendor/bin/pest') && passthru('vendor/bin/pest');\""
+        ],
         "analyse": "php phpstan.phar analyse --memory-limit=1G",
         "format": "php pint.phar",
         "format:check": "php pint.phar --test"

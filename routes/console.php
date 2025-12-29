@@ -16,7 +16,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Artisan::command('inspire', function (): void {
-    // $this is bound to the Command instance by Laravel's Artisan::command()
+    // Note: Closure-based commands are idiomatic in Laravel Zero.
+    // $this is bound to Command instance by Artisan::command() at runtime.
     /** @phpstan-ignore variable.undefined */
     $this->comment('Simplicity is the ultimate sophistication. - Leonardo da Vinci');
 })->purpose('Display an inspiring quote');

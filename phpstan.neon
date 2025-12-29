@@ -4,6 +4,7 @@ parameters:
         - config
         - routes
         - bootstrap
+        - tests
     
     # Use maximum level for strictness
     level: 9
@@ -35,7 +36,8 @@ parameters:
     
     excludePaths:
         - vendor
-        - tests
+        - tests/Pest.php
+        - tests/Feature
     
     # Ignore Laravel framework internals
     ignoreErrors:
