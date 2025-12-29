@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.3",
         "laravel-zero/framework": "^12.0",
-        "symfony/yaml": "*"
+        "symfony/yaml": "^7.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",

@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
+use App\Commands\Concerns\FormatsDeploymentPlan;
 use App\Config\ConfigLoader;
 use App\Providers\Deployment\ProviderFactory;
 use Illuminate\Console\Command;
 
 final class ApplyCommand extends Command
 {
+    use FormatsDeploymentPlan;
+
     /**
      * The name and signature of the console command.
      *
@@ -83,12 +86,9 @@ final class ApplyCommand extends Command
 
             $plan = $provider->plan($project, $profile);
             $this->info('Deployment Configuration:');
-            $planProvider = $plan['provider'] ?? 'unknown';
-            $this->line('  Provider: '.(\is_scalar($planProvider) ? (string) $planProvider : 'unknown'));
-            $planBranch = $plan['branch'] ?? 'unknown';
-            $this->line('  Branch:   '.(\is_scalar($planBranch) ? (string) $planBranch : 'unknown'));
-            $planPath = $plan['path'] ?? 'unknown';
-            $this->line('  Path:     '.(\is_scalar($planPath) ? (string) $planPath : 'unknown'));
+            $this->line('  Provider: '.$this->getPlanValue($plan, 'provider'));
+            $this->line('  Branch:   '.$this->getPlanValue($plan, 'branch'));
+            $this->line('  Path:     '.$this->getPlanValue($plan, 'path'));
             $this->line('');
 
             // Confirm

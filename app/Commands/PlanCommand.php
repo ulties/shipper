@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
+use App\Commands\Concerns\FormatsDeploymentPlan;
 use App\Config\ConfigLoader;
 use App\Providers\Deployment\ProviderFactory;
 use Illuminate\Console\Command;
 
 final class PlanCommand extends Command
 {
+    use FormatsDeploymentPlan;
+
     /**
      * The name and signature of the console command.
      *
@@ -80,22 +83,17 @@ final class PlanCommand extends Command
             $plan = $provider->plan($project, $profile);
 
             $this->info('Deployment Plan:');
-            $provider = $plan['provider'] ?? 'unknown';
-            $this->line('  Provider: '.(\is_scalar($provider) ? (string) $provider : 'unknown'));
-            $project = $plan['project'] ?? 'unknown';
-            $this->line('  Project:  '.(\is_scalar($project) ? (string) $project : 'unknown'));
-            $profile = $plan['profile'] ?? 'unknown';
-            $this->line('  Profile:  '.(\is_scalar($profile) ? (string) $profile : 'unknown'));
-            $branch = $plan['branch'] ?? 'unknown';
-            $this->line('  Branch:   '.(\is_scalar($branch) ? (string) $branch : 'unknown'));
-            $path = $plan['path'] ?? 'unknown';
-            $this->line('  Path:     '.(\is_scalar($path) ? (string) $path : 'unknown'));
+            $this->line('  Provider: '.$this->getPlanValue($plan, 'provider'));
+            $this->line('  Project:  '.$this->getPlanValue($plan, 'project'));
+            $this->line('  Profile:  '.$this->getPlanValue($plan, 'profile'));
+            $this->line('  Branch:   '.$this->getPlanValue($plan, 'branch'));
+            $this->line('  Path:     '.$this->getPlanValue($plan, 'path'));
 
-            if (isset($plan['server_id']) && \is_scalar($plan['server_id'])) {
-                $this->line('  Server:   '.(string) $plan['server_id']);
+            if (isset($plan['server_id'])) {
+                $this->line('  Server:   '.$this->getPlanValue($plan, 'server_id'));
             }
-            if (isset($plan['site_id']) && \is_scalar($plan['site_id'])) {
-                $this->line('  Site:     '.(string) $plan['site_id']);
+            if (isset($plan['site_id'])) {
+                $this->line('  Site:     '.$this->getPlanValue($plan, 'site_id'));
             }
 
             $this->line('');
