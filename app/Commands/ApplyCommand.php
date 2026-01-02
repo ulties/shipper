@@ -108,6 +108,9 @@ final class ApplyCommand extends Command
             $this->line('  Domain:    '.$this->getPlanValue($plan, 'domain'));
             $this->line('');
 
+            $this->comment('Triggering deployment and waiting for completion...');
+            $this->line('');
+
             $result = $provider->apply($project, $profile);
 
             if ($result) {

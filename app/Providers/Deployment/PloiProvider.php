@@ -181,10 +181,14 @@ final class PloiProvider extends AbstractDeploymentProvider
             $timeout = $this->getDeploymentTimeout();
             $pollInterval = 5; // Poll every 5 seconds
             $elapsed = 0;
+            $initialCheck = true;
 
             while ($elapsed < $timeout) {
-                \sleep($pollInterval);
-                $elapsed += $pollInterval;
+                if (! $initialCheck) {
+                    \sleep($pollInterval);
+                    $elapsed += $pollInterval;
+                }
+                $initialCheck = false;
 
                 // Get site status
                 $siteResponse = $server->sites($siteId)->get();
@@ -194,24 +198,35 @@ final class PloiProvider extends AbstractDeploymentProvider
                     continue;
                 }
 
-                // Check deployment status
-                $deploymentStatus = \property_exists($siteInfo, 'deployment_status') ? $siteInfo->deployment_status : null;
+                // Check if site is currently deploying
+                $isDeploying = \property_exists($siteInfo, 'deploying') ? (bool) $siteInfo->deploying : false;
 
-                if ($deploymentStatus === 'deployed' || $deploymentStatus === 'success') {
+                // If not deploying anymore, check for errors in recent logs
+                if (! $isDeploying && $elapsed > 0) {
+                    // Deployment completed, check logs for success/failure
+                    $logs = $this->getDeploymentLogs($serverId, $siteId);
+
+                    // Check if any recent log indicates failure
+                    foreach ($logs as $log) {
+                        $logLower = \strtolower($log);
+                        if (\str_contains($logLower, 'deployment failed') ||
+                            \str_contains($logLower, 'error') ||
+                            \str_contains($logLower, 'failed')) {
+                            $this->lastError = 'Deployment failed on Ploi server (detected in logs)';
+
+                            return false;
+                        }
+                    }
+
+                    // No failures detected, deployment successful
                     return true;
                 }
 
-                if ($deploymentStatus === 'failed') {
-                    $this->lastError = 'Deployment failed on Ploi server';
-
-                    return false;
-                }
-
-                // If status is null or 'deploying', continue polling
+                // Still deploying, continue polling
             }
 
-            // Timeout reached
-            $this->lastError = "Deployment timeout after {$timeout} seconds. Status check incomplete.";
+            // Timeout reached - this could mean deployment is still running
+            $this->lastError = "Deployment timeout after {$timeout} seconds. Deployment may still be running on Ploi.";
 
             return false;
         } catch (\Ploi\Exceptions\Http\Unauthenticated $e) {
