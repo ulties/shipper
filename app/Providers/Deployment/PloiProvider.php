@@ -10,6 +10,12 @@ use Ploi\Ploi;
 
 final class PloiProvider extends AbstractDeploymentProvider
 {
+    /**
+     * Delay in seconds to wait after deployment completes before fetching logs.
+     * This ensures Ploi has time to finalize log entries.
+     */
+    private const LOG_FETCH_DELAY_SECONDS = 5;
+
     private ?Ploi $client = null;
 
     private string $lastError = '';
@@ -213,7 +219,7 @@ final class PloiProvider extends AbstractDeploymentProvider
                         $this->lastError = 'Deployment failed on Ploi server (deployment status: failed)';
 
                         // Wait a moment and fetch logs to provide details
-                        \sleep(5);
+                        \sleep(self::LOG_FETCH_DELAY_SECONDS);
                         $logs = $this->getDeploymentLogs($serverId, $siteId);
                         if ($logs !== []) {
                             $this->lastError .= "\nRecent logs:\n".\implode("\n", \array_slice($logs, 0, 10));
@@ -223,7 +229,7 @@ final class PloiProvider extends AbstractDeploymentProvider
                     }
 
                     // Wait a few seconds after deployment completes to ensure logs are fully written
-                    \sleep(5);
+                    \sleep(self::LOG_FETCH_DELAY_SECONDS);
 
                     // Deployment completed, check logs for success/failure
                     $logs = $this->getDeploymentLogs($serverId, $siteId);
