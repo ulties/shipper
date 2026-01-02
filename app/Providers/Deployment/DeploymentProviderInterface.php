@@ -32,4 +32,9 @@ interface DeploymentProviderInterface
      * Get provider name.
      */
     public function getName(): string;
+
+    /**
+     * Get the last error message from a failed operation.
+     */
+    public function getLastError(): string;
 }

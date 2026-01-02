@@ -30,6 +30,44 @@ final class ConfigLoader
     }
 
     /**
+     * Interpolate environment variables in a string value.
+     * Supports ${VAR_NAME} syntax.
+     */
+    private function interpolateEnvVars(string $value): string
+    {
+        return \preg_replace_callback(
+            '/\$\{([A-Z_][A-Z0-9_]*)\}/',
+            function (array $matches): string {
+                $envVar = $matches[1];
+                $envValue = \getenv($envVar);
+
+                return $envValue !== false ? $envValue : $matches[0];
+            },
+            $value,
+        ) ?? $value;
+    }
+
+    /**
+     * Recursively interpolate environment variables in array values.
+     *
+     * @param array<mixed, mixed> $data
+     *
+     * @return array<mixed, mixed>
+     */
+    private function interpolateArray(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if (\is_string($value)) {
+                $data[$key] = $this->interpolateEnvVars($value);
+            } elseif (\is_array($value)) {
+                $data[$key] = $this->interpolateArray($value);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * @param array<string, mixed> $data
      */
     private function parseConfig(array $data): DeployerConfig
@@ -39,12 +77,15 @@ final class ConfigLoader
 
         if (! \is_array($providers)) {
             $providers = [];
+        } else {
+            $providers = $this->interpolateArray($providers);
         }
 
         if (isset($data['projects']) && \is_array($data['projects'])) {
             foreach ($data['projects'] as $projectName => $projectData) {
                 if (\is_string($projectName) && \is_array($projectData)) {
                     /** @var array<string, mixed> $projectData */
+                    $projectData = $this->interpolateArray($projectData);
                     $projects[$projectName] = $this->parseProject($projectName, $projectData);
                 }
             }

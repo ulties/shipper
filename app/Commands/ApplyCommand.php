@@ -100,6 +100,14 @@ final class ApplyCommand extends Command
 
             // Apply
             $this->info('Executing deployment...');
+            $this->line('');
+
+            // Add debug information
+            $this->comment('Debug Information:');
+            $this->line('  Server ID: '.$this->getPlanValue($plan, 'server_id'));
+            $this->line('  Domain:    '.$this->getPlanValue($plan, 'domain'));
+            $this->line('');
+
             $result = $provider->apply($project, $profile);
 
             if ($result) {
@@ -109,6 +117,14 @@ final class ApplyCommand extends Command
             }
 
             $this->error('✗ Deployment failed!');
+
+            // Display error details if available
+            $errorMessage = $provider->getLastError();
+            if ($errorMessage !== '') {
+                $this->line('');
+                $this->error('Error Details:');
+                $this->line("  {$errorMessage}");
+            }
 
             return self::FAILURE;
         } catch (\Exception $e) {

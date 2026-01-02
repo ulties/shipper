@@ -12,9 +12,16 @@ final class PloiProvider extends AbstractDeploymentProvider
 {
     private ?Ploi $client = null;
 
+    private string $lastError = '';
+
     public function getName(): string
     {
         return 'ploi';
+    }
+
+    public function getLastError(): string
+    {
+        return $this->lastError;
     }
 
     public function validate(ProjectConfig $project, ProfileConfig $profile): array
@@ -64,11 +71,21 @@ final class PloiProvider extends AbstractDeploymentProvider
 
     public function apply(ProjectConfig $project, ProfileConfig $profile): bool
     {
+        $this->lastError = '';
+        $serverId = 0;
+        $domain = '';
+
         try {
             $client = $this->getClient();
             $serverId = (int) $this->getServerId();
             $domainValue = $profile->get('domain');
             $domain = \is_string($domainValue) ? $domainValue : '';
+
+            if ($domain === '') {
+                $this->lastError = 'Domain is empty or invalid';
+
+                return false;
+            }
 
             // Get the server
             $server = $client->server($serverId);
@@ -92,11 +109,15 @@ final class PloiProvider extends AbstractDeploymentProvider
                 $response = $server->sites()->create($domain);
                 $responseData = $response->getJson()->data ?? null;
                 if ($responseData === null || ! \property_exists($responseData, 'id')) {
+                    $this->lastError = 'Failed to create site: Invalid response from Ploi API';
+
                     return false;
                 }
                 $siteId = (int) $responseData->id;
             } else {
                 if (! \property_exists($existingSite, 'id')) {
+                    $this->lastError = 'Existing site found but has no ID';
+
                     return false;
                 }
                 $siteId = (int) $existingSite->id;
@@ -104,12 +125,31 @@ final class PloiProvider extends AbstractDeploymentProvider
 
             // Deploy the site
             $site = $server->sites($siteId);
-            $site->deployment()->deploy();
+            $deployResponse = $site->deployment()->deploy();
+
+            // Check if deployment was successful
+            $deployData = $deployResponse->getJson();
+            if (isset($deployData->message) && \is_string($deployData->message)) {
+                $this->lastError = "Ploi API message: {$deployData->message}";
+            }
 
             return true;
+        } catch (\Ploi\Exceptions\Http\Unauthenticated $e) {
+            $this->lastError = "Authentication failed: Invalid Ploi API key. {$e->getMessage()}";
+
+            return false;
+        } catch (\Ploi\Exceptions\Http\NotFound $e) {
+            $serverInfo = $serverId > 0 ? "Server ID {$serverId}" : 'The requested server';
+            $this->lastError = "Resource not found: {$serverInfo} may not exist or you don't have access. {$e->getMessage()}";
+
+            return false;
+        } catch (\Ploi\Exceptions\Http\NotValid $e) {
+            $this->lastError = "Validation error: {$e->getMessage()}";
+
+            return false;
         } catch (\Exception $e) {
-            // In production, you'd want to log this error
-            // For now, we'll just return false
+            $this->lastError = "Deployment error: {$e->getMessage()} (Type: ".\get_class($e).')';
+
             return false;
         }
     }

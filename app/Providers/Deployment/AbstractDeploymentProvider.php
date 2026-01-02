@@ -40,4 +40,9 @@ abstract class AbstractDeploymentProvider implements DeploymentProviderInterface
     abstract public function apply(ProjectConfig $project, ProfileConfig $profile): bool;
 
     abstract public function getName(): string;
+
+    public function getLastError(): string
+    {
+        return '';
+    }
 }
