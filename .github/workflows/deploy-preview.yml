@@ -44,14 +44,15 @@ jobs:
       
       - name: Validate configuration
         run: ./deployer validate
+        env:
+          PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
       
       - name: Plan deployment
         run: ./deployer plan ${{ matrix.project }} --profile=preview
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_PREVIEW: ${{ secrets.PLOI_SERVER_ID_PREVIEW }}
-          PLOI_SITE_ID_API_PREVIEW: ${{ secrets.PLOI_SITE_ID_API_PREVIEW }}
-          PLOI_SITE_ID_FRONTEND_PREVIEW: ${{ secrets.PLOI_SITE_ID_FRONTEND_PREVIEW }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
       
@@ -59,9 +60,6 @@ jobs:
         run: ./deployer apply ${{ matrix.project }} --profile=preview --force
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_PREVIEW: ${{ secrets.PLOI_SERVER_ID_PREVIEW }}
-          PLOI_SITE_ID_API_PREVIEW: ${{ secrets.PLOI_SITE_ID_API_PREVIEW }}
-          PLOI_SITE_ID_FRONTEND_PREVIEW: ${{ secrets.PLOI_SITE_ID_FRONTEND_PREVIEW }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
       
@@ -69,9 +67,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const domain = '${{ matrix.project }}' === 'api' 
+              ? 'api-preview-${{ github.event.pull_request.number }}.ulties.dev'
+              : 'preview-${{ github.event.pull_request.number }}.ulties.dev';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🚀 Preview deployed for **${{ matrix.project }}**!\n\nBranch: `${{ github.head_ref }}`\nProfile: `preview`'
+              body: `🚀 Preview deployed for **${{ matrix.project }}**!\n\n**URL:** https://${domain}\n**Branch:** \`${{ github.head_ref }}\`\n**Profile:** preview`
             })

@@ -42,19 +42,15 @@ jobs:
       
       - name: Validate configuration
         run: ./deployer validate
+        env:
+          PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
       
       - name: Plan deployment
         run: ./deployer plan ${{ matrix.project }} --profile=staging
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_STAGE: ${{ secrets.PLOI_SERVER_ID_STAGE }}
-          PLOI_SITE_ID_API_STAGE: ${{ secrets.PLOI_SITE_ID_API_STAGE }}
-          PLOI_SITE_ID_FRONTEND_STAGE: ${{ secrets.PLOI_SITE_ID_FRONTEND_STAGE }}
       
       - name: Deploy to staging
         run: ./deployer apply ${{ matrix.project }} --profile=staging --force
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_STAGE: ${{ secrets.PLOI_SERVER_ID_STAGE }}
-          PLOI_SITE_ID_API_STAGE: ${{ secrets.PLOI_SITE_ID_API_STAGE }}
-          PLOI_SITE_ID_FRONTEND_STAGE: ${{ secrets.PLOI_SITE_ID_FRONTEND_STAGE }}

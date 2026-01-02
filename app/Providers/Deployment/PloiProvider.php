@@ -6,9 +6,12 @@ namespace App\Providers\Deployment;
 
 use App\Config\ProfileConfig;
 use App\Config\ProjectConfig;
+use Ploi\Ploi;
 
 final class PloiProvider extends AbstractDeploymentProvider
 {
+    private ?Ploi $client = null;
+
     public function getName(): string
     {
         return 'ploi';
@@ -23,14 +26,13 @@ final class PloiProvider extends AbstractDeploymentProvider
             $errors[] = 'Ploi API key is required';
         }
 
-        $serverId = $profile->get('server_id');
-        if ($serverId === null || $serverId === '') {
-            $errors[] = "Server ID is required for profile: {$profile->name()}";
+        if (! isset($this->config['server_id']) || $this->config['server_id'] === '') {
+            $errors[] = 'Ploi server ID is required';
         }
 
-        $siteId = $profile->get('site_id');
-        if ($siteId === null || $siteId === '') {
-            $errors[] = "Site ID is required for profile: {$profile->name()}";
+        $domain = $profile->get('domain');
+        if ($domain === null || $domain === '') {
+            $errors[] = "Domain is required for profile: {$profile->name()}";
         }
 
         return $errors;
@@ -38,28 +40,97 @@ final class PloiProvider extends AbstractDeploymentProvider
 
     public function plan(ProjectConfig $project, ProfileConfig $profile): array
     {
+        $serverId = $this->getServerId();
+        $domainValue = $profile->get('domain');
+        $domain = \is_string($domainValue) ? $domainValue : '';
+
         return [
             'provider' => $this->getName(),
             'project' => $project->name(),
             'profile' => $profile->name(),
             'branch' => $profile->branch(),
             'path' => $project->path(),
-            'server_id' => $profile->get('server_id'),
-            'site_id' => $profile->get('site_id'),
+            'server_id' => $serverId,
+            'domain' => $domain,
             'actions' => [
+                "Create or find site for domain: {$domain}",
+                'Configure repository and branch',
                 'Deploy site via Ploi API',
                 'Run deployment script',
-                'Refresh OPcache if configured',
             ],
-            'note' => 'This is a dry-run. No actual deployment will occur.',
+            'note' => 'This will create a real deployment on Ploi server '.$serverId,
         ];
     }
 
     public function apply(ProjectConfig $project, ProfileConfig $profile): bool
     {
-        // Stub implementation - would make actual Ploi API calls here
-        // Example: POST https://ploi.io/api/servers/{server_id}/sites/{site_id}/deploy
+        try {
+            $client = $this->getClient();
+            $serverId = (int) $this->getServerId();
+            $domainValue = $profile->get('domain');
+            $domain = \is_string($domainValue) ? $domainValue : '';
 
-        return true; // Stub: assume success
+            // Get the server
+            $server = $client->server($serverId);
+
+            // Check if site already exists
+            $sites = $server->sites()->get();
+            $existingSite = null;
+
+            $siteData = $sites->getJson()->data ?? null;
+            if ($siteData !== null && \is_array($siteData)) {
+                foreach ($siteData as $site) {
+                    if (\is_object($site) && \property_exists($site, 'domain') && $site->domain === $domain) {
+                        $existingSite = $site;
+                        break;
+                    }
+                }
+            }
+
+            // Create site if it doesn't exist
+            if ($existingSite === null) {
+                $response = $server->sites()->create($domain);
+                $responseData = $response->getJson()->data ?? null;
+                if ($responseData === null || ! \property_exists($responseData, 'id')) {
+                    return false;
+                }
+                $siteId = (int) $responseData->id;
+            } else {
+                if (! \property_exists($existingSite, 'id')) {
+                    return false;
+                }
+                $siteId = (int) $existingSite->id;
+            }
+
+            // Deploy the site
+            $site = $server->sites($siteId);
+            $site->deployment()->deploy();
+
+            return true;
+        } catch (\Exception $e) {
+            // In production, you'd want to log this error
+            // For now, we'll just return false
+            return false;
+        }
+    }
+
+    private function getClient(): Ploi
+    {
+        if ($this->client === null) {
+            $apiKey = $this->config['api_key'] ?? '';
+            if (! \is_string($apiKey)) {
+                $apiKey = '';
+            }
+            $this->client = new Ploi($apiKey);
+        }
+
+        return $this->client;
+    }
+
+    private function getServerId(): string
+    {
+        $serverId = $this->config['server_id'] ?? '';
+
+        return \is_string($serverId) ? $serverId : '';
     }
 }

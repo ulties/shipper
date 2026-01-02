@@ -6,6 +6,7 @@ providers:
   ploi:
     api_key: "${PLOI_API_KEY}" # Set via environment variable
     api_url: "https://ploi.io/api"
+    server_id: "105556" # Default server ID for all deployments
 
 # Projects to deploy
 projects:
@@ -16,19 +17,13 @@ projects:
     profiles:
       production:
         branch: main
-        server_id: "${PLOI_SERVER_ID_PROD}"
-        site_id: "${PLOI_SITE_ID_API_PROD}"
-        domain: api.example.com
+        domain: api-live.ulties.dev
       staging:
         branch: develop
-        server_id: "${PLOI_SERVER_ID_STAGE}"
-        site_id: "${PLOI_SITE_ID_API_STAGE}"
-        domain: api-staging.example.com
+        domain: api-test.ulties.dev
       preview:
         branch: "${GITHUB_HEAD_REF}" # PR branch
-        server_id: "${PLOI_SERVER_ID_PREVIEW}"
-        site_id: "${PLOI_SITE_ID_API_PREVIEW}"
-        domain: "api-pr-${GITHUB_PR_NUMBER}.example.com"
+        domain: "api-preview-${GITHUB_PR_NUMBER}.ulties.dev"
 
   # Example Frontend App
   frontend:
@@ -37,16 +32,10 @@ projects:
     profiles:
       production:
         branch: main
-        server_id: "${PLOI_SERVER_ID_PROD}"
-        site_id: "${PLOI_SITE_ID_FRONTEND_PROD}"
-        domain: www.example.com
+        domain: live.ulties.dev
       staging:
         branch: develop
-        server_id: "${PLOI_SERVER_ID_STAGE}"
-        site_id: "${PLOI_SITE_ID_FRONTEND_STAGE}"
-        domain: staging.example.com
+        domain: test.ulties.dev
       preview:
         branch: "${GITHUB_HEAD_REF}"
-        server_id: "${PLOI_SERVER_ID_PREVIEW}"
-        site_id: "${PLOI_SITE_ID_FRONTEND_PREVIEW}"
-        domain: "pr-${GITHUB_PR_NUMBER}.example.com"
+        domain: "preview-${GITHUB_PR_NUMBER}.ulties.dev"

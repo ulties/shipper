@@ -67,6 +67,7 @@ providers:
   ploi:
     api_key: "${PLOI_API_KEY}"
     api_url: "https://ploi.io/api"
+    server_id: "105556"  # Your Ploi server ID
 
 projects:
   api:
@@ -75,13 +76,20 @@ projects:
     profiles:
       production:
         branch: main
-        server_id: "${PLOI_SERVER_ID_PROD}"
-        site_id: "${PLOI_SITE_ID_API_PROD}"
+        domain: api-live.ulties.dev
       staging:
         branch: develop
-        server_id: "${PLOI_SERVER_ID_STAGE}"
-        site_id: "${PLOI_SITE_ID_API_STAGE}"
+        domain: api-test.ulties.dev
+      preview:
+        branch: "${GITHUB_HEAD_REF}"
+        domain: "api-preview-${GITHUB_PR_NUMBER}.ulties.dev"
 ```
+
+**Configuration Notes:**
+- The `server_id` is configured once at the provider level
+- Sites are automatically created/found by domain name
+- No need to manually manage site IDs - the deployer handles this automatically
+- Domains use subdomains of ulties.dev for different environments
 
 ### CLI Commands
 

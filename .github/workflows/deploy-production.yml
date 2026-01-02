@@ -42,19 +42,15 @@ jobs:
       
       - name: Validate configuration
         run: ./deployer validate
+        env:
+          PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
       
       - name: Plan deployment
         run: ./deployer plan ${{ matrix.project }} --profile=production
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_PROD: ${{ secrets.PLOI_SERVER_ID_PROD }}
-          PLOI_SITE_ID_API_PROD: ${{ secrets.PLOI_SITE_ID_API_PROD }}
-          PLOI_SITE_ID_FRONTEND_PROD: ${{ secrets.PLOI_SITE_ID_FRONTEND_PROD }}
       
       - name: Deploy to production
         run: ./deployer apply ${{ matrix.project }} --profile=production --force
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
-          PLOI_SERVER_ID_PROD: ${{ secrets.PLOI_SERVER_ID_PROD }}
-          PLOI_SITE_ID_API_PROD: ${{ secrets.PLOI_SITE_ID_API_PROD }}
-          PLOI_SITE_ID_FRONTEND_PROD: ${{ secrets.PLOI_SITE_ID_FRONTEND_PROD }}
