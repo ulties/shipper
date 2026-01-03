@@ -215,13 +215,12 @@ final class PloiProvider extends AbstractDeploymentProvider
                 // If not deploying anymore, deployment has completed
                 if (! $isDeploying) {
                     // Check if deployment failed based on site status
-                    // Ploi may provide deployment status fields
-                    $deploymentStatus = \property_exists($siteInfo, 'deployment_status') ? $siteInfo->deployment_status : null;
-                    $lastDeploymentStatus = \property_exists($siteInfo, 'last_deployment_status') ? $siteInfo->last_deployment_status : null;
+                    // Ploi provides a 'status' field that can be 'deploy-failed'
+                    $status = \property_exists($siteInfo, 'status') ? $siteInfo->status : null;
 
                     // Check for explicit failure status
-                    if ($deploymentStatus === 'failed' || $lastDeploymentStatus === 'failed') {
-                        $this->lastError = 'Deployment failed on Ploi server (deployment status: failed)';
+                    if ($status === 'deploy-failed') {
+                        $this->lastError = 'Deployment failed on Ploi server (status: deploy-failed)';
 
                         // Wait a moment and fetch logs to provide details
                         \sleep(self::LOG_FETCH_DELAY_SECONDS);
