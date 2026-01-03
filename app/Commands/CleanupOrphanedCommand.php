@@ -67,7 +67,7 @@ final class CleanupOrphanedCommand extends Command
             $this->info('Starting cleanup of orphaned preview sites...');
             $this->line('');
 
-            // Get Ploi provider
+            // Get Ploi provider - find first project that uses Ploi
             $providerFactory = new ProviderFactory($config->providers());
             $projects = $config->projects();
 
@@ -77,29 +77,24 @@ final class CleanupOrphanedCommand extends Command
                 return self::SUCCESS;
             }
 
-            // Assume first project uses Ploi (we can enhance this later)
-            $firstProject = null;
+            // Find first project that uses Ploi provider
+            $ploiProvider = null;
             foreach ($projects as $project) {
-                $firstProject = $project;
-                break;
+                $provider = $providerFactory->create($project->provider());
+                if ($provider instanceof PloiProvider) {
+                    $ploiProvider = $provider;
+                    break;
+                }
             }
 
-            if ($firstProject === null) {
-                $this->warn('No projects found');
-
-                return self::SUCCESS;
-            }
-
-            $provider = $providerFactory->create($firstProject->provider());
-
-            if (! $provider instanceof PloiProvider) {
-                $this->error('Only Ploi provider is supported for cleanup');
+            if ($ploiProvider === null) {
+                $this->error('No projects using Ploi provider found. Only Ploi provider is supported for cleanup.');
 
                 return self::FAILURE;
             }
 
             // Get all sites from Ploi
-            $allSites = $this->getAllSites($provider);
+            $allSites = $this->getAllSites($ploiProvider);
 
             if ($allSites === []) {
                 $this->info('No sites found on server');
@@ -150,7 +145,7 @@ final class CleanupOrphanedCommand extends Command
             foreach ($orphanedSites as $site) {
                 $this->line('Deleting site: '.$site['domain'].'...');
 
-                if ($this->deleteSite($provider, $site['site_id'])) {
+                if ($this->deleteSite($ploiProvider, $site['site_id'])) {
                     $deleted++;
                     $this->info('  ✓ Deleted successfully');
                 } else {
@@ -231,6 +226,27 @@ final class CleanupOrphanedCommand extends Command
                         'page' => $page,
                     ],
                 ]);
+
+                $statusCode = $response->getStatusCode();
+
+                // Handle common API errors
+                if ($statusCode === 401) {
+                    $this->error('GitHub API authentication failed. Please check your GITHUB_TOKEN.');
+
+                    return [];
+                }
+
+                if ($statusCode === 403) {
+                    $this->error('GitHub API access forbidden. Check your token permissions or rate limits.');
+
+                    return [];
+                }
+
+                if ($statusCode === 429) {
+                    $this->error('GitHub API rate limit exceeded. Please try again later.');
+
+                    return [];
+                }
 
                 $body = (string) $response->getBody();
                 $prs = \json_decode($body, true);
@@ -321,9 +337,13 @@ final class CleanupOrphanedCommand extends Command
 
                 // Convert preview domain pattern to regex
                 // Example: "api-preview-${GITHUB_PR_NUMBER}.ulties.dev" -> "api-preview-(\d+)\.ulties\.dev"
-                $pattern = $previewDomain;
-                $pattern = \str_replace('${GITHUB_PR_NUMBER}', '(\d+)', $pattern);
-                $pattern = \str_replace('.', '\.', $pattern);
+                // Quote the pattern to escape special regex characters
+                $pattern = \preg_quote($previewDomain, '/');
+
+                // Replace the quoted variable placeholder with a regex capture group
+                $pattern = \str_replace(\preg_quote('${GITHUB_PR_NUMBER}', '/'), '(\d+)', $pattern);
+
+                // Create the full regex pattern
                 $pattern = '/^'.$pattern.'$/';
 
                 if (\preg_match($pattern, $domain, $matches) === 1) {
