@@ -58,7 +58,9 @@ final class CleanupOrphanedCommand extends Command
             $this->line('');
 
             $flow = new \App\Flows\CleanupOrphanedSitesFlow;
-            $result = $flow->handle($configPath, $githubRepo, $githubToken, $dryRun);
+
+            // First, run in dry-run mode to find orphaned sites
+            $result = $flow->handle($configPath, $githubRepo, $githubToken, true);
 
             if (! $result['success'] && $result['error_message'] !== '') {
                 $this->error($result['error_message']);
@@ -92,9 +94,11 @@ final class CleanupOrphanedCommand extends Command
                 return self::SUCCESS;
             }
 
-            foreach ($orphanedSites as $site) {
-                $this->line('Deleting site: '.$site['domain'].'...');
-            }
+            // Actually delete the sites
+            $this->line('');
+            $this->info('Deleting sites...');
+
+            $result = $flow->handle($configPath, $githubRepo, $githubToken, false);
 
             $deleted = $result['deleted'];
             $failed = $result['failed'];
