@@ -16,7 +16,7 @@ use App\Providers\Deployment\ProviderFactory;
 final class DestroyDeploymentFlow
 {
     /**
-     * Destroy a deployment.
+     * Plan a site destruction (validation + plan creation, no execution).
      *
      * @return array{success: bool, project: ProjectConfig|null, profile: ProfileConfig|null, plan: array<string, mixed>, errors: array<int, string>, error_message: string, provider: DeploymentProviderInterface|null}
      */
@@ -25,7 +25,6 @@ final class DestroyDeploymentFlow
         $loadAction = new LoadConfigurationAction;
         $validateAction = new ValidateProjectAction;
         $planAction = new CreateDeploymentPlanAction;
-        $destroyAction = new DestroySiteAction;
 
         $config = $loadAction->handle($configPath);
 
@@ -72,16 +71,35 @@ final class DestroyDeploymentFlow
         }
 
         $plan = $planAction->handle($provider, $project, $profile);
-        $result = $destroyAction->handle($provider, $project, $profile);
 
         return [
-            'success' => $result,
+            'success' => true,
             'project' => $project,
             'profile' => $profile,
             'plan' => $plan,
             'errors' => [],
-            'error_message' => $result ? '' : $provider->getLastError(),
+            'error_message' => '',
             'provider' => $provider,
+        ];
+    }
+
+    /**
+     * Execute site destruction (after planning and confirmation).
+     *
+     * @return array{success: bool, error_message: string}
+     */
+    public function execute(
+        DeploymentProviderInterface $provider,
+        ProjectConfig $project,
+        ProfileConfig $profile,
+    ): array {
+        $destroyAction = new DestroySiteAction;
+
+        $result = $destroyAction->handle($provider, $project, $profile);
+
+        return [
+            'success' => $result,
+            'error_message' => $result ? '' : $provider->getLastError(),
         ];
     }
 }

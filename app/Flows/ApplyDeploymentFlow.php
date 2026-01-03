@@ -18,17 +18,15 @@ use App\Providers\Deployment\ProviderFactory;
 final class ApplyDeploymentFlow
 {
     /**
-     * Apply a deployment.
+     * Plan a deployment (validation + plan creation, no execution).
      *
-     * @return array{success: bool, project: ProjectConfig|null, profile: ProfileConfig|null, plan: array<string, mixed>, logs: array<int, string>, errors: array<int, string>, error_message: string, provider: DeploymentProviderInterface|null}
+     * @return array{success: bool, project: ProjectConfig|null, profile: ProfileConfig|null, plan: array<string, mixed>, errors: array<int, string>, error_message: string, provider: DeploymentProviderInterface|null}
      */
     public function handle(string $configPath, string $projectName, string $profileName): array
     {
         $loadAction = new LoadConfigurationAction;
         $validateAction = new ValidateProjectAction;
         $planAction = new CreateDeploymentPlanAction;
-        $deployAction = new ExecuteDeploymentAction;
-        $logsAction = new GetDeploymentLogsAction;
 
         $config = $loadAction->handle($configPath);
 
@@ -39,7 +37,6 @@ final class ApplyDeploymentFlow
                 'project' => null,
                 'profile' => null,
                 'plan' => [],
-                'logs' => [],
                 'errors' => [],
                 'error_message' => "Project not found: {$projectName}",
                 'provider' => null,
@@ -53,7 +50,6 @@ final class ApplyDeploymentFlow
                 'project' => $project,
                 'profile' => null,
                 'plan' => [],
-                'logs' => [],
                 'errors' => [],
                 'error_message' => "Profile not found: {$profileName}",
                 'provider' => null,
@@ -70,7 +66,6 @@ final class ApplyDeploymentFlow
                 'project' => $project,
                 'profile' => $profile,
                 'plan' => [],
-                'logs' => [],
                 'errors' => $errors,
                 'error_message' => 'Configuration validation failed',
                 'provider' => $provider,
@@ -78,6 +73,34 @@ final class ApplyDeploymentFlow
         }
 
         $plan = $planAction->handle($provider, $project, $profile);
+
+        return [
+            'success' => true,
+            'project' => $project,
+            'profile' => $profile,
+            'plan' => $plan,
+            'errors' => [],
+            'error_message' => '',
+            'provider' => $provider,
+        ];
+    }
+
+    /**
+     * Execute a deployment (after planning and confirmation).
+     *
+     * @param array<string, mixed> $plan
+     *
+     * @return array{success: bool, logs: array<int, string>, error_message: string}
+     */
+    public function execute(
+        DeploymentProviderInterface $provider,
+        ProjectConfig $project,
+        ProfileConfig $profile,
+        array $plan,
+    ): array {
+        $deployAction = new ExecuteDeploymentAction;
+        $logsAction = new GetDeploymentLogsAction;
+
         $result = $deployAction->handle($provider, $project, $profile);
 
         $logs = [];
@@ -91,13 +114,8 @@ final class ApplyDeploymentFlow
 
         return [
             'success' => $result,
-            'project' => $project,
-            'profile' => $profile,
-            'plan' => $plan,
             'logs' => $logs,
-            'errors' => [],
             'error_message' => $result ? '' : $provider->getLastError(),
-            'provider' => $provider,
         ];
     }
 }

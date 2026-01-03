@@ -49,30 +49,29 @@ final class DestroyCommand extends Command
 
         try {
             $flow = new DestroyDeploymentFlow;
-            $result = $flow->handle($configPath, $projectName, $profileName);
 
-            if (! $result['success'] && $result['errors'] !== []) {
+            // First, plan the destruction (no execution yet)
+            $planResult = $flow->handle($configPath, $projectName, $profileName);
+
+            if (! $planResult['success'] && $planResult['errors'] !== []) {
                 $this->error('Configuration validation failed:');
-                foreach ($result['errors'] as $error) {
+                foreach ($planResult['errors'] as $error) {
                     $this->error("  ✗ {$error}");
                 }
 
                 return self::FAILURE;
             }
 
-            if (! $result['success'] && $result['project'] === null) {
-                $this->error($result['error_message']);
+            if (! $planResult['success']) {
+                $this->error($planResult['error_message']);
 
                 return self::FAILURE;
             }
 
-            if (! $result['success'] && $result['profile'] === null) {
-                $this->error($result['error_message']);
-
-                return self::FAILURE;
-            }
-
-            $plan = $result['plan'];
+            $plan = $planResult['plan'];
+            $project = $planResult['project'];
+            $profile = $planResult['profile'];
+            $provider = $planResult['provider'];
 
             $this->info("Destroying {$projectName} ({$profileName})...");
             $this->line('');
@@ -83,6 +82,7 @@ final class DestroyCommand extends Command
             $this->line('  Branch:   '.$this->getPlanValue($plan, 'branch'));
             $this->line('');
 
+            // Get confirmation BEFORE destroying
             if (! $force && ! $this->confirm('Do you want to destroy this site?', false)) {
                 $this->warn('Destroy cancelled.');
 
@@ -92,7 +92,10 @@ final class DestroyCommand extends Command
             $this->info('Destroying site...');
             $this->line('');
 
-            if ($result['success']) {
+            // Now execute the destruction
+            $executeResult = $flow->execute($provider, $project, $profile);
+
+            if ($executeResult['success']) {
                 $this->info('✓ Site destroyed successfully!');
 
                 return self::SUCCESS;
@@ -100,10 +103,10 @@ final class DestroyCommand extends Command
 
             $this->error('✗ Destroy failed!');
 
-            if ($result['error_message'] !== '') {
+            if ($executeResult['error_message'] !== '') {
                 $this->line('');
                 $this->error('Error Details:');
-                $this->line("  {$result['error_message']}");
+                $this->line("  {$executeResult['error_message']}");
             }
 
             return self::FAILURE;

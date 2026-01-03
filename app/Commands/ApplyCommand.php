@@ -49,30 +49,29 @@ final class ApplyCommand extends Command
 
         try {
             $flow = new ApplyDeploymentFlow;
-            $result = $flow->handle($configPath, $projectName, $profileName);
 
-            if (! $result['success'] && $result['errors'] !== []) {
+            // First, plan the deployment (no execution yet)
+            $planResult = $flow->handle($configPath, $projectName, $profileName);
+
+            if (! $planResult['success'] && $planResult['errors'] !== []) {
                 $this->error('Configuration validation failed:');
-                foreach ($result['errors'] as $error) {
+                foreach ($planResult['errors'] as $error) {
                     $this->error("  ✗ {$error}");
                 }
 
                 return self::FAILURE;
             }
 
-            if (! $result['success'] && $result['project'] === null) {
-                $this->error($result['error_message']);
+            if (! $planResult['success']) {
+                $this->error($planResult['error_message']);
 
                 return self::FAILURE;
             }
 
-            if (! $result['success'] && $result['profile'] === null) {
-                $this->error($result['error_message']);
-
-                return self::FAILURE;
-            }
-
-            $plan = $result['plan'];
+            $plan = $planResult['plan'];
+            $project = $planResult['project'];
+            $profile = $planResult['profile'];
+            $provider = $planResult['provider'];
 
             $this->info("Deploying {$projectName} ({$profileName})...");
             $this->line('');
@@ -83,6 +82,7 @@ final class ApplyCommand extends Command
             $this->line('  Path:     '.$this->getPlanValue($plan, 'path'));
             $this->line('');
 
+            // Get confirmation BEFORE executing
             if (! $force && ! $this->confirm('Do you want to continue?', false)) {
                 $this->warn('Deployment cancelled.');
 
@@ -100,14 +100,17 @@ final class ApplyCommand extends Command
             $this->comment('Triggering deployment and waiting for completion...');
             $this->line('');
 
-            if ($result['success']) {
+            // Now execute the deployment
+            $executeResult = $flow->execute($provider, $project, $profile, $plan);
+
+            if ($executeResult['success']) {
                 $this->info('✓ Deployment completed successfully!');
 
-                if ($result['logs'] !== []) {
+                if ($executeResult['logs'] !== []) {
                     $this->line('');
                     $this->info('Deployment Logs:');
                     $this->line('');
-                    foreach ($result['logs'] as $log) {
+                    foreach ($executeResult['logs'] as $log) {
                         $this->line("  {$log}");
                     }
                 }
@@ -117,17 +120,17 @@ final class ApplyCommand extends Command
 
             $this->error('✗ Deployment failed!');
 
-            if ($result['error_message'] !== '') {
+            if ($executeResult['error_message'] !== '') {
                 $this->line('');
                 $this->error('Error Details:');
-                $this->line("  {$result['error_message']}");
+                $this->line("  {$executeResult['error_message']}");
             }
 
-            if ($result['logs'] !== []) {
+            if ($executeResult['logs'] !== []) {
                 $this->line('');
                 $this->info('Deployment Logs:');
                 $this->line('');
-                foreach ($result['logs'] as $log) {
+                foreach ($executeResult['logs'] as $log) {
                     $this->line("  {$log}");
                 }
             }
