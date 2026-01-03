@@ -86,7 +86,8 @@ final class GetOpenPullRequestsAction
 
             return ['success' => true, 'prs' => $prNumbers, 'error' => ''];
         } catch (ClientException|RequestException $e) {
-            $statusCode = $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0;
+            $response = $e->hasResponse() ? $e->getResponse() : null;
+            $statusCode = $response !== null ? $response->getStatusCode() : 0;
             $error = "GitHub API request failed (status {$statusCode}): {$e->getMessage()}";
 
             if ($this->logger !== null) {

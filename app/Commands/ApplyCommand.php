@@ -73,6 +73,11 @@ final class ApplyCommand extends Command
             $profile = $planResult['profile'];
             $provider = $planResult['provider'];
 
+            // These should be set if success is true, but assert for type safety
+            \assert($project !== null);
+            \assert($profile !== null);
+            \assert($provider !== null);
+
             $this->info("Deploying {$projectName} ({$profileName})...");
             $this->line('');
 
