@@ -124,7 +124,7 @@ final class PloiProvider extends AbstractDeploymentProvider
                     'user' => $db->user(),
                     'type' => $db->type(),
                 ],
-                $databases
+                $databases,
             ),
             'actions' => $actions,
             'note' => 'This will create a real deployment on Ploi server '.$serverId,
