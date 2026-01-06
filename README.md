@@ -86,8 +86,8 @@ projects:
     # Database configuration
     databases:
       main:
-        name: "${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
-        user: "${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
+        name: "deployer_${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
+        user: "deployer_${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
         type: mysql
     profiles:
       production:
@@ -124,8 +124,8 @@ projects:
 - Databases are linked to their respective sites
 - When a site is destroyed, its associated databases are also deleted
 - Examples:
-  - For project "api" with profile "production", using pattern `${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}`, the database name will be "api_production"
-  - For project "api" with profile "preview" and PR #123, the database name will be "api_preview_123"
+  - For project "api" with profile "production", using pattern `deployer_${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}`, the database name will be "deployer_api_production"
+  - For project "api" with profile "preview" and PR #123, the database name will be "deployer_api_preview_123"
 
 ### CLI Commands
 
