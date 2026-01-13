@@ -20,7 +20,7 @@ final class ApplyCommand extends Command
     protected $signature = 'apply 
                             {project : Project name to deploy} 
                             {--profile=production : Profile to use}
-                            {--config=deployer.yml : Path to config file}
+                            {--config=shipper.yml : Path to config file}
                             {--force : Skip confirmation prompt}';
 
     /**

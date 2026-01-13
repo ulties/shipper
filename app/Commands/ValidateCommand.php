@@ -14,14 +14,14 @@ final class ValidateCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'validate {--config=deployer.yml : Path to config file}';
+    protected $signature = 'validate {--config=shipper.yml : Path to config file}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Validate the deployer configuration';
+    protected $description = 'Validate the shipper configuration';
 
     /**
      * Execute the console command.
