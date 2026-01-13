@@ -53,9 +53,30 @@ Modern testing with:
 
 ## Installation
 
+### For Development
+
 ```bash
 composer install
 cp .env.example .env
+```
+
+### Using Pre-built Binary
+
+Download the latest binary from the [releases page](https://github.com/ulties/deployer-wip/releases):
+
+```bash
+# Download latest release
+curl -LSso shipper https://github.com/ulties/deployer-wip/releases/latest/download/shipper
+chmod +x shipper
+./shipper --version
+```
+
+Or use a specific version:
+
+```bash
+# Download specific version
+curl -LSso shipper https://github.com/ulties/deployer-wip/releases/download/v1.0.0/shipper
+chmod +x shipper
 ```
 
 ## Usage
