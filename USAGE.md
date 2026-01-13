@@ -149,11 +149,11 @@ projects:
       
       staging:
         branch: develop
-        domain: staging.your-app.yourdomain.com
+        domain: your-app-staging.yourdomain.com
       
       preview:
         branch: "${GITHUB_HEAD_REF}"
-        domain: "preview-${GITHUB_PR_NUMBER}.your-app.yourdomain.com"
+        domain: "your-app-preview-${GITHUB_PR_NUMBER}.yourdomain.com"
 ```
 
 ### Step 3: Configure GitHub Repository Secrets
@@ -348,7 +348,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const domain = 'preview-${{ github.event.pull_request.number }}.your-app.yourdomain.com';
+            const domain = 'your-app-preview-${{ github.event.pull_request.number }}.yourdomain.com';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -411,7 +411,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const domain = 'preview-${{ github.event.pull_request.number }}.your-app.yourdomain.com';
+            const domain = 'your-app-preview-${{ github.event.pull_request.number }}.yourdomain.com';
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -575,7 +575,7 @@ projects:
     profiles:
       production:
         branch: main
-        domain: app.yourdomain.com
+        domain: frontend.yourdomain.com
 ```
 
 Update GitHub Actions to deploy specific projects:
