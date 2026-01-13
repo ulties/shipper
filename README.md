@@ -58,7 +58,18 @@ composer install
 cp .env.example .env
 ```
 
-## Usage
+## Using Shipper in Another Repository
+
+**📖 For detailed instructions on using Shipper for your own repository, see [USAGE.md](USAGE.md)**
+
+The USAGE.md guide includes:
+- Step-by-step setup instructions
+- GitHub Actions workflow templates
+- Configuration examples
+- Security setup for private repositories
+- Troubleshooting tips
+
+## Usage (This Repository)
 
 ### Configuration
 
