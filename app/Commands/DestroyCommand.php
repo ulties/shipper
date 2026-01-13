@@ -20,7 +20,7 @@ final class DestroyCommand extends Command
     protected $signature = 'destroy 
                             {project : Project name to destroy} 
                             {--profile=production : Profile to use}
-                            {--config=deployer.yml : Path to config file}
+                            {--config=shipper.yml : Path to config file}
                             {--force : Skip confirmation prompt}';
 
     /**

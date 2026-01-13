@@ -15,7 +15,7 @@ final class CleanupOrphanedCommand extends Command
      * @var string
      */
     protected $signature = 'cleanup-orphaned 
-                            {--config=deployer.yml : Path to config file}
+                            {--config=shipper.yml : Path to config file}
                             {--dry-run : Show what would be deleted without actually deleting}
                             {--force : Skip confirmation prompt}';
 

@@ -20,7 +20,7 @@ final class PlanCommand extends Command
     protected $signature = 'plan 
                             {project : Project name to plan} 
                             {--profile=production : Profile to use}
-                            {--config=deployer.yml : Path to config file}';
+                            {--config=shipper.yml : Path to config file}';
 
     /**
      * The console command description.

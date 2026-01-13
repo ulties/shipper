@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialize the application
  */
 function initializeApp() {
-    console.log('Deployer Frontend Example loaded successfully!');
+    console.log('Shipper Frontend Example loaded successfully!');
     
     // Track page view
     incrementCounter('visitorCount');
