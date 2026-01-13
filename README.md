@@ -320,6 +320,19 @@ GitHub Actions automatically runs:
 
 All checks must pass before merging.
 
+## Documentation
+
+For comprehensive guides and detailed documentation, see the [docs folder](./docs/):
+
+- **[Configuration Guide](./docs/CONFIGURATION.md)** - Complete shipper.yml configuration reference
+- **[PR Previews](./docs/PR_PREVIEWS.md)** - Set up preview environments for pull requests
+- **[Sites Management](./docs/SITES.md)** - Managing site lifecycle and deployment
+- **[Database Management](./docs/DATABASES.md)** - Database configuration and operations
+- **[GitHub Actions Setup](./docs/GITHUB_ACTIONS.md)** - Automated deployments with GitHub Actions
+- **[GitHub Action Usage](./docs/GITHUB_ACTION.md)** - Using Shipper as a reusable GitHub Action
+- **[Build System](./docs/BUILD_SYSTEM.md)** - Understanding the build and release process
+- **[Strict Standards](./docs/STRICT_STANDARDS.md)** - Code quality and type safety standards
+
 ## Strict Rules Applied
 
 1. **Type Safety**: Every method has explicit parameter and return types
