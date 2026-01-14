@@ -67,10 +67,14 @@ final class PloiProvider extends AbstractDeploymentProvider
         if (empty($repository)) {
             $errors[] = 'Repository configuration is required';
         } else {
-            if (! isset($repository['provider']) || $repository['provider'] === '') {
+            $providerMixed = $repository['provider'] ?? null;
+            \assert(\is_string($providerMixed) || $providerMixed === null);
+            if ($providerMixed === null || $providerMixed === '') {
                 $errors[] = 'Repository provider is required (github, gitlab, bitbucket, or custom)';
             }
-            if (! isset($repository['name']) || $repository['name'] === '') {
+            $nameMixed = $repository['name'] ?? null;
+            \assert(\is_string($nameMixed) || $nameMixed === null);
+            if ($nameMixed === null || $nameMixed === '') {
                 $errors[] = 'Repository name is required (e.g., username/repository)';
             }
         }
@@ -85,9 +89,11 @@ final class PloiProvider extends AbstractDeploymentProvider
         $domain = \is_string($domainValue) ? $domainValue : '';
         $repository = $project->repository();
         $repoProviderValue = $repository['provider'] ?? 'unknown';
-        $repoProvider = \is_string($repoProviderValue) ? $repoProviderValue : 'unknown';
+        \assert(\is_string($repoProviderValue));
+        $repoProvider = $repoProviderValue;
         $repoNameValue = $repository['name'] ?? 'unknown';
-        $repoName = \is_string($repoNameValue) ? $repoNameValue : 'unknown';
+        \assert(\is_string($repoNameValue));
+        $repoName = $repoNameValue;
 
         $actions = [
             "Create or find site for domain: {$domain}",
@@ -154,8 +160,12 @@ final class PloiProvider extends AbstractDeploymentProvider
 
             // Get repository configuration
             $repository = $project->repository();
-            $repoProvider = \is_string($repository['provider'] ?? null) ? $repository['provider'] : '';
-            $repoName = \is_string($repository['name'] ?? null) ? $repository['name'] : '';
+            $repoProviderMixed = $repository['provider'] ?? null;
+            \assert(\is_string($repoProviderMixed) || $repoProviderMixed === null);
+            $repoProvider = \is_string($repoProviderMixed) ? $repoProviderMixed : '';
+            $repoNameMixed = $repository['name'] ?? null;
+            \assert(\is_string($repoNameMixed) || $repoNameMixed === null);
+            $repoName = \is_string($repoNameMixed) ? $repoNameMixed : '';
             $branch = $profile->branch();
 
             // Check if site already exists
@@ -461,10 +471,9 @@ final class PloiProvider extends AbstractDeploymentProvider
     {
         if ($this->client === null) {
             $apiKey = $this->config['api_key'] ?? '';
-            if (! \is_string($apiKey)) {
-                $apiKey = '';
-            }
-            $this->client = new Ploi($apiKey);
+            \assert(\is_string($apiKey) || $apiKey === '');
+            $apiKeyString = \is_string($apiKey) ? $apiKey : '';
+            $this->client = new Ploi($apiKeyString);
         }
 
         return $this->client;
@@ -473,15 +482,17 @@ final class PloiProvider extends AbstractDeploymentProvider
     public function getServerId(): string
     {
         $serverId = $this->config['server_id'] ?? '';
+        \assert(\is_string($serverId) || \is_int($serverId) || \is_float($serverId));
 
-        return \is_string($serverId) ? $serverId : '';
+        return \is_string($serverId) ? $serverId : (string) $serverId;
     }
 
     private function getDeploymentTimeout(): int
     {
         $timeout = $this->config['deployment_timeout'] ?? 60;
+        \assert(\is_int($timeout) || \is_string($timeout) || \is_float($timeout));
 
-        return \is_int($timeout) ? $timeout : 60;
+        return \is_int($timeout) ? $timeout : (int) $timeout;
     }
 
     /**
