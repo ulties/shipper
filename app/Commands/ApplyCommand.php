@@ -36,7 +36,7 @@ final class ApplyCommand extends Command
     public function handle(): int
     {
         $configPath = $this->option('config') ?? 'shipper.yml';
-        $projectName = $this->argument('project') ?? '';
+        $projectName = (string) $this->argument('project');
         $profileName = $this->option('profile') ?? 'production';
         $force = (bool) $this->option('force');
 
