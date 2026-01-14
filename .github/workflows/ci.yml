@@ -22,9 +22,12 @@ jobs:
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: ${{ matrix.php }}
+        php-version: '8.3'
         extensions: mbstring, xml, ctype, json
         coverage: none
+    
+    - name: Verify PHP version
+      run: php -v
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
