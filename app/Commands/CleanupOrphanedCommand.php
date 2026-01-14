@@ -31,9 +31,9 @@ final class CleanupOrphanedCommand extends Command
      */
     public function handle(): int
     {
-        $configPath = $this->option('config');
-        $dryRun = $this->option('dry-run');
-        $force = $this->option('force');
+        $configPath = $this->option('config') ?? 'shipper.yml';
+        $dryRun = (bool) $this->option('dry-run');
+        $force = (bool) $this->option('force');
 
         try {
             $githubToken = \getenv('GITHUB_TOKEN');

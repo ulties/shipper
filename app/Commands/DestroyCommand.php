@@ -35,10 +35,10 @@ final class DestroyCommand extends Command
      */
     public function handle(): int
     {
-        $configPath = $this->option('config');
-        $projectName = $this->argument('project');
-        $profileName = $this->option('profile');
-        $force = $this->option('force');
+        $configPath = $this->option('config') ?? 'shipper.yml';
+        $projectName = $this->argument('project') ?? '';
+        $profileName = $this->option('profile') ?? 'production';
+        $force = (bool) $this->option('force');
 
         try {
             $flow = new DestroyDeploymentFlow;
@@ -65,6 +65,9 @@ final class DestroyCommand extends Command
             $project = $planResult['project'];
             $profile = $planResult['profile'];
             $provider = $planResult['provider'];
+
+            // At this point, success is true, so these must be non-null
+            assert($project !== null && $profile !== null && $provider !== null);
 
             $this->info("Destroying {$projectName} ({$profileName})...");
             $this->line('');
