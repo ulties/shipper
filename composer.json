@@ -49,10 +49,5 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
-    },
-    "repositories": [{
-        "name": "packagist",
-        "type": "composer",
-        "url": "https://packagist.org"
-    }]
+    }
 }
