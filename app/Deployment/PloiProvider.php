@@ -89,11 +89,9 @@ final class PloiProvider extends AbstractDeploymentProvider
         $domain = \is_string($domainValue) ? $domainValue : '';
         $repository = $project->repository();
         $repoProviderValue = $repository['provider'] ?? 'unknown';
-        \assert(\is_string($repoProviderValue));
-        $repoProvider = $repoProviderValue;
+        $repoProvider = \is_string($repoProviderValue) ? $repoProviderValue : 'unknown';
         $repoNameValue = $repository['name'] ?? 'unknown';
-        \assert(\is_string($repoNameValue));
-        $repoName = $repoNameValue;
+        $repoName = \is_string($repoNameValue) ? $repoNameValue : 'unknown';
 
         $actions = [
             "Create or find site for domain: {$domain}",
