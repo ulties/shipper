@@ -20,11 +20,14 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Setup PHP
-      uses: shivammathur/setup-php@v2
+      uses: shivammathur/setup-php@2.31.1
       with:
-        php-version: ${{ matrix.php }}
+        php-version: '8.3'
         extensions: mbstring, xml, ctype, json
         coverage: none
+    
+    - name: Verify PHP version
+      run: php -v
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
