@@ -34,9 +34,9 @@ final class PlanCommand extends Command
      */
     public function handle(): int
     {
-        $configPath = $this->option('config') ?? 'shipper.yml';
+        $configPath = (string) $this->option('config');
         $projectName = (string) $this->argument('project');
-        $profileName = $this->option('profile') ?? 'production';
+        $profileName = (string) $this->option('profile');
 
         try {
             $flow = new PlanDeploymentFlow;

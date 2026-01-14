@@ -28,7 +28,7 @@ final class ValidateCommand extends Command
      */
     public function handle(): int
     {
-        $configPath = $this->option('config') ?? 'shipper.yml';
+        $configPath = (string) $this->option('config');
 
         $this->info("Validating configuration: {$configPath}");
 

@@ -31,7 +31,7 @@ final class CleanupOrphanedCommand extends Command
      */
     public function handle(): int
     {
-        $configPath = $this->option('config') ?? 'shipper.yml';
+        $configPath = (string) $this->option('config');
         $dryRun = (bool) $this->option('dry-run');
         $force = (bool) $this->option('force');
 
