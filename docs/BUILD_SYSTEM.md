@@ -74,7 +74,7 @@ chmod +x shipper
 
 ### Reusable GitHub Action
 
-The `.github/actions/shipper-cli/action.yml` provides a reusable action that:
+The `.github/actions/shipper/action.yml` provides a reusable action that:
 
 1. Downloads the binary from releases
 2. Verifies it's executable and valid
@@ -84,7 +84,7 @@ The `.github/actions/shipper-cli/action.yml` provides a reusable action that:
 **Usage in other repositories**:
 
 ```yaml
-- uses: ulties/shipper/.github/actions/shipper-cli@main
+- uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -117,7 +117,7 @@ The `.github/actions/shipper-cli/action.yml` provides a reusable action that:
 │   ├── workflows/
 │   │   └── build-release.yml                  # Build automation
 │   └── actions/
-│       └── shipper-cli/
+│       └── shipper/
 │           ├── action.yml                     # Reusable action
 │           └── README.md                      # Action documentation
 └── builds/                                    # Build output (gitignored)
@@ -230,7 +230,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ulties/shipper/.github/actions/shipper-cli@main
+      - uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: validate
 ```

@@ -18,12 +18,12 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Validate Configuration
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: validate
       
       - name: Deploy to Production
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: api
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Deploy ${{ matrix.project }}
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: ${{ matrix.project }}
@@ -78,7 +78,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Plan Preview Deployment
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: plan
           project: api
@@ -89,7 +89,7 @@ jobs:
           GITHUB_HEAD_REF: ${{ github.head_ref }}
       
       - name: Deploy Preview
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: api
@@ -105,7 +105,7 @@ jobs:
 
 ```yaml
 - name: Deploy with Specific Version
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -122,7 +122,7 @@ If your `shipper.yml` is not in the repository root:
 
 ```yaml
 - name: Deploy from Subdirectory
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api

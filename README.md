@@ -283,12 +283,12 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Run Shipper Validation
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: validate
       
       - name: Deploy to Production
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: api

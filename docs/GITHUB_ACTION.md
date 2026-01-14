@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Deploy to Production
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: api
@@ -43,7 +43,7 @@ jobs:
 
 The Shipper CLI action is available at:
 ```
-ulties/shipper/.github/actions/shipper-cli@main
+ulties/shipper/.github/actions/shipper@main
 ```
 
 **Reference Options:**
@@ -152,7 +152,7 @@ Exit code from the Shipper command.
 ```yaml
 - name: Deploy
   id: deploy
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -172,7 +172,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Validate Configuration
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: validate
   env:
@@ -183,7 +183,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Plan Deployment
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: plan
     project: api
@@ -196,7 +196,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Deploy to Production
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -210,7 +210,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Deploy Preview
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -226,7 +226,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Cleanup Preview
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: destroy
     project: api
@@ -242,7 +242,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Deploy with Specific Version
-  uses: ulties/shipper/.github/actions/shipper-cli@v1.0.0
+  uses: ulties/shipper/.github/actions/shipper@v1.0.0
   with:
     command: apply
     project: api
@@ -257,7 +257,7 @@ Exit code from the Shipper command.
 
 ```yaml
 - name: Deploy from Subdirectory
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -290,14 +290,14 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Validate
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: validate
         env:
           PLOI_API_KEY: ${{ secrets.PLOI_API_KEY }}
       
       - name: Deploy ${{ matrix.project }}
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: ${{ matrix.project }}
@@ -329,7 +329,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Deploy Preview
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: apply
           project: api
@@ -358,7 +358,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Cleanup Preview
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: destroy
           project: api
@@ -400,7 +400,7 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: ${{ inputs.plan-only && 'Plan' || 'Deploy' }} ${{ inputs.project }}
-        uses: ulties/shipper/.github/actions/shipper-cli@main
+        uses: ulties/shipper/.github/actions/shipper@main
         with:
           command: ${{ inputs.plan-only && 'plan' || 'apply' }}
           project: ${{ inputs.project }}
@@ -479,7 +479,7 @@ The Shipper GitHub Action:
 ### Using Latest Version
 
 ```yaml
-uses: ulties/shipper/.github/actions/shipper-cli@main
+uses: ulties/shipper/.github/actions/shipper@main
 with:
   version: latest  # or omit version input
 ```
@@ -495,7 +495,7 @@ with:
 ### Using Specific Version
 
 ```yaml
-uses: ulties/shipper/.github/actions/shipper-cli@v1.0.0
+uses: ulties/shipper/.github/actions/shipper@v1.0.0
 with:
   version: v1.0.0
 ```
@@ -513,7 +513,7 @@ with:
 Pin the action reference for maximum stability:
 
 ```yaml
-uses: ulties/shipper/.github/actions/shipper-cli@v1.0.0
+uses: ulties/shipper/.github/actions/shipper@v1.0.0
 with:
   command: apply
   project: api
@@ -599,7 +599,7 @@ with:
 **Using Shipper Action:**
 ```yaml
 - name: Deploy
-  uses: ulties/shipper/.github/actions/shipper-cli@main
+  uses: ulties/shipper/.github/actions/shipper@main
   with:
     command: apply
     project: api
@@ -642,7 +642,7 @@ steps:
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - uses: ulties/shipper/.github/actions/shipper-cli@main
+  - uses: ulties/shipper/.github/actions/shipper@main
     with:
       command: apply
       project: api
