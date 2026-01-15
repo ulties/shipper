@@ -16,7 +16,7 @@ use App\Clients\GitHubHttpClient;
     \expect($config)->toHaveKey('base_uri');
     \expect($config)->toHaveKey('headers');
     \expect($config)->toHaveKey('http_errors');
-    
+
     // Now assert types for safe array access
     \assert(\is_array($config));
     $baseUri = $config['base_uri'];
