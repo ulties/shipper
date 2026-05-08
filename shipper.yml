@@ -19,9 +19,10 @@ projects:
     repository:
       provider: github # github, gitlab, bitbucket, or custom
       name: ulties/shipper # username/repository
-    # Site configuration
+# Site configuration
     web_directory: /public # Default Laravel public directory
-    project_root: / # Root of the project
+    project_root: /
+    php_version: "8.3"
     # SSL configuration
     ssl:
       enabled: true
@@ -45,6 +46,79 @@ projects:
         name: "shipper_cli_${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
         user: "shipper_cli_${PROJECT_NAME}_${PROFILE}_${GITHUB_PR_NUMBER}"
         type: mysql
+    # Queue workers
+    queues:
+      default:
+        enabled: true
+        connection: database
+        queue: default
+        processes: 1
+        max_tries: 1
+        timeout: 60
+        max_seconds: 60
+        sleep: 30
+        restart_on_deploy: true
+      emails:
+        enabled: true
+        connection: redis
+        queue: emails
+        processes: 3
+        max_tries: 3
+        timeout: 120
+        max_seconds: 120
+        sleep: 10
+        restart_on_deploy: true
+    # Cron jobs
+    cron:
+      scheduler:
+        command: "php artisan schedule:run"
+        frequency: "* * * * *"
+        user: "ploi"
+        enabled: true
+      backup:
+        command: "php artisan backup:run"
+        frequency: "0 2 * * *"
+        user: "ploi"
+        enabled: true
+    # Daemon processes
+    daemons:
+      websocket:
+        command: "php artisan websockets:serve"
+        user: "ploi"
+        processes: 1
+        directory: "/home/ploi/{site}"
+        enabled: true
+        restart_delay: 10
+      horizon:
+        command: "php artisan horizon"
+        user: "ploi"
+        processes: 1
+        directory: ""
+        enabled: true
+        restart_delay: 10
+    # Network rules (firewall)
+    network_rules:
+      allow-redis:
+        name: "Allow Redis"
+        port: 6379
+        type: tcp
+        rule_type: allow
+        from_ip: "10.0.0.0/8"
+      allow-ssh:
+        name: "Allow SSH"
+        port: 22
+    # Redirects
+    redirects:
+      www-to-non-www:
+        from: "/old-api"
+        to: "/api/v2"
+        type: "redirect"
+        enabled: true
+      legacy:
+        from: "/legacy"
+        to: "/v2"
+        type: "permanent"
+        enabled: true
     profiles:
       production:
         branch: main

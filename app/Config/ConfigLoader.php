@@ -206,8 +206,10 @@ final class ConfigLoader
         $webDirectory = $data['web_directory'] ?? '/public';
         $projectRoot = $data['project_root'] ?? '/';
         $deployScript = $data['deploy_script'] ?? '';
-        $phpVersion = $data['php_version'] ?? '8.3';
-        $nginxConfig = $data['nginx_config'] ?? null;
+        $phpVersionRaw = $data['php_version'] ?? null;
+        $nginxConfigRaw = $data['nginx_config'] ?? null;
+        $phpVersion = \is_string($phpVersionRaw) ? $phpVersionRaw : '';
+        $nginxConfig = \is_string($nginxConfigRaw) ? $nginxConfigRaw : '';
 
         return new ProjectConfig(
             $name,
@@ -226,8 +228,8 @@ final class ConfigLoader
             $daemons,
             $networkRules,
             $redirects,
-            \is_string($phpVersion) ? $phpVersion : '8.3',
-            \is_string($nginxConfig) ? $nginxConfig : null,
+            $phpVersion,
+            $nginxConfig,
         );
     }
 
@@ -278,12 +280,14 @@ final class ConfigLoader
     {
         return new QueueConfig(
             isset($data['enabled']) ? (bool) $data['enabled'] : false,
-            isset($data['connection']) && \is_string($data['connection']) ? $data['connection'] : 'redis',
+            isset($data['connection']) && \is_string($data['connection']) ? $data['connection'] : 'database',
             isset($data['queue']) && \is_string($data['queue']) ? $data['queue'] : 'default',
             isset($data['processes']) && \is_int($data['processes']) ? $data['processes'] : (isset($data['processes']) && \is_numeric($data['processes']) ? (int) $data['processes'] : 1),
-            isset($data['max_tries']) && \is_int($data['max_tries']) ? $data['max_tries'] : (isset($data['max_tries']) && \is_numeric($data['max_tries']) ? (int) $data['max_tries'] : 3),
+            isset($data['max_tries']) && \is_int($data['max_tries']) ? $data['max_tries'] : (isset($data['max_tries']) && \is_numeric($data['max_tries']) ? (int) $data['max_tries'] : 1),
             isset($data['timeout']) && \is_int($data['timeout']) ? $data['timeout'] : (isset($data['timeout']) && \is_numeric($data['timeout']) ? (int) $data['timeout'] : 60),
             isset($data['restart_on_deploy']) ? (bool) $data['restart_on_deploy'] : true,
+            isset($data['max_seconds']) && \is_int($data['max_seconds']) ? $data['max_seconds'] : (isset($data['max_seconds']) && \is_numeric($data['max_seconds']) ? (int) $data['max_seconds'] : 60),
+            isset($data['sleep']) && \is_int($data['sleep']) ? $data['sleep'] : (isset($data['sleep']) && \is_numeric($data['sleep']) ? (int) $data['sleep'] : 30),
         );
     }
 
@@ -336,7 +340,7 @@ final class ConfigLoader
     {
         $from = isset($data['from']) && \is_string($data['from']) ? $data['from'] : '';
         $to = isset($data['to']) && \is_string($data['to']) ? $data['to'] : '';
-        $type = isset($data['type']) && \is_int($data['type']) ? $data['type'] : (isset($data['type']) && \is_numeric($data['type']) ? (int) $data['type'] : 301);
+        $type = isset($data['type']) ? $data['type'] : 301;
         $enabled = isset($data['enabled']) ? (bool) $data['enabled'] : true;
 
         return new RedirectConfig($from, $to, $type, $enabled);

@@ -8,10 +8,10 @@ final class QueueConfig
 {
     public function __construct(
         private readonly bool $enabled = false,
-        private readonly string $connection = 'redis',
+        private readonly string $connection = 'database',
         private readonly string $queue = 'default',
         private readonly int $processes = 1,
-        private readonly int $maxTries = 3,
+        private readonly int $maxTries = 1,
         private readonly int $timeout = 60,
         private readonly bool $restartOnDeploy = true,
         private readonly int $maxSeconds = 60,

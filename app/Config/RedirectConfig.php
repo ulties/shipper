@@ -9,7 +9,7 @@ final class RedirectConfig
     public function __construct(
         private readonly string $from,
         private readonly string $to,
-        private readonly int $type = 301,
+        private readonly int|string $type = 301,
         private readonly bool $enabled = true,
     ) {}
 
@@ -28,7 +28,7 @@ final class RedirectConfig
         return $this->to;
     }
 
-    public function type(): int
+    public function type(): int|string
     {
         return $this->type;
     }

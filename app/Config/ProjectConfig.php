@@ -33,8 +33,8 @@ final class ProjectConfig
         private readonly array $daemons = [],
         private readonly array $networkRules = [],
         private readonly array $redirects = [],
-        private readonly string $phpVersion = '8.3',
-        private readonly ?string $nginxConfig = null,
+        private readonly string $phpVersion = '',
+        private readonly string $nginxConfig = '',
     ) {}
 
     public function name(): string
@@ -181,7 +181,7 @@ final class ProjectConfig
         return $this->phpVersion;
     }
 
-    public function nginxConfig(): ?string
+    public function nginxConfig(): string
     {
         return $this->nginxConfig;
     }
