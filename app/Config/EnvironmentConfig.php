@@ -36,10 +36,10 @@ final class EnvironmentConfig
         return isset($this->variables[$key]);
     }
 
-    public function mergeWith(EnvironmentConfig $other): EnvironmentConfig
+    public function mergeWith(self $other): self
     {
-        return new EnvironmentConfig(
-            array_merge($this->variables, $other->variables),
+        return new self(
+            \array_merge($this->variables, $other->variables),
         );
     }
 }

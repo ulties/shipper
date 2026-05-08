@@ -98,12 +98,12 @@ final class ProjectConfig
 
     public function ssl(): SslConfig
     {
-        return $this->ssl ?? new SslConfig();
+        return $this->ssl ?? new SslConfig;
     }
 
     public function environment(): EnvironmentConfig
     {
-        return $this->environment ?? new EnvironmentConfig();
+        return $this->environment ?? new EnvironmentConfig;
     }
 
     public function deployScript(): string

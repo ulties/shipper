@@ -41,7 +41,7 @@ final class ProfileConfig
 
     public function environment(): EnvironmentConfig
     {
-        return $this->environment ?? new EnvironmentConfig();
+        return $this->environment ?? new EnvironmentConfig;
     }
 
     /**
@@ -56,6 +56,6 @@ final class ProfileConfig
         }
 
         /** @var array<string> */
-        return array_filter($aliases, '\is_string');
+        return \array_filter($aliases, '\is_string');
     }
 }
