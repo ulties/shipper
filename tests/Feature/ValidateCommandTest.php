@@ -17,6 +17,6 @@ final class ValidateCommandTest extends Tests\TestCase
     {
         $process = new Process(['php', 'shipper', 'validate', '--config', 'shipper.yml']);
         $process->run();
-        $this->assertEquals(0, $process->getExitCode(), 'Expected exit 0, got ' . $process->getExitCode() . '. Output: ' . $process->getOutput() . '. Error: ' . $process->getErrorOutput());
+        $this->assertEquals(0, $process->getExitCode(), 'Expected exit 0, got '.$process->getExitCode().'. Output: '.$process->getOutput().'. Error: '.$process->getErrorOutput());
     }
 }
