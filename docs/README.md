@@ -1,5 +1,7 @@
 # Shipper Documentation
 
+![Shipper Banner](https://raw.githubusercontent.com/shippercli/assets/main/banner.png)
+
 Welcome to the Shipper documentation! This comprehensive guide covers everything you need to know about deploying applications with Shipper.
 
 ## Quick Links
@@ -167,9 +169,9 @@ Shipper handles:
 ## Support and Resources
 
 ### Getting Help
+- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/shippercli/cli/issues)
 
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/ulties/shipper/issues)
-- **Discussions**: Ask questions on [GitHub Discussions](https://github.com/ulties/shipper/discussions)
+- **Discussions**: Ask questions on [GitHub Discussions](https://github.com/shippercli/cli/discussions)
 - **Documentation**: Browse this comprehensive documentation
 
 ### Contributing
@@ -245,7 +247,7 @@ Shipper is open-source software licensed under the MIT license.
 
 ## Updates and Changelog
 
-Check the [releases page](https://github.com/ulties/shipper/releases) for:
+Check the [releases page](https://github.com/shippercli/cli/releases) for:
 - New features
 - Bug fixes
 - Breaking changes

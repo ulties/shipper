@@ -54,7 +54,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-This creates a release at: `https://github.com/ulties/shipper/releases/tag/v1.0.0`
+This creates a release at: `https://github.com/shippercli/cli/releases/tag/v1.0.0`
 
 ## Distribution
 
@@ -64,11 +64,11 @@ Each tagged version creates a release with the binary attached. Users can downlo
 
 ```bash
 # Latest version
-curl -LSso shipper https://github.com/ulties/shipper/releases/latest/download/shipper
+curl -LSso shipper https://github.com/shippercli/cli/releases/latest/download/shipper
 chmod +x shipper
 
 # Specific version
-curl -LSso shipper https://github.com/ulties/shipper/releases/download/v1.0.0/shipper
+curl -LSso shipper https://github.com/shippercli/cli/releases/download/v1.0.0/shipper
 chmod +x shipper
 ```
 
