@@ -6,6 +6,7 @@ namespace App\Flows;
 
 use App\Actions\ApplyAliasAction;
 use App\Actions\ApplyDeployScriptAction;
+use App\Actions\ApplyEnvironmentAction;
 use App\Actions\CreateDeploymentPlanAction;
 use App\Actions\ExecuteDeploymentAction;
 use App\Actions\GetDeploymentLogsAction;
@@ -115,6 +116,7 @@ final class ApplyDeploymentFlow
         $logsAction = new GetDeploymentLogsAction;
         $aliasAction = new ApplyAliasAction;
         $deployScriptAction = new ApplyDeployScriptAction;
+        $environmentAction = new ApplyEnvironmentAction;
 
         $result = $deployAction->handle($provider, $project, $profile);
 
@@ -173,6 +175,33 @@ final class ApplyDeploymentFlow
                     $errorMsg = 'Deploy script configuration failed';
                     if (isset($deployScriptResult['message']) && \is_string($deployScriptResult['message'])) {
                         $errorMsg = $deployScriptResult['message'];
+                    }
+
+                    return [
+                        'success' => false,
+                        'logs' => $logs,
+                        'error_message' => $errorMsg,
+                    ];
+                }
+            }
+
+            $projectEnv = $project->environment();
+            $profileEnv = $profile->environment();
+            $mergedEnv = $projectEnv->mergeWith($profileEnv);
+
+            if (! $mergedEnv->isEmpty()) {
+                $envResult = $environmentAction->handle(
+                    $provider->getName(),
+                    $provider instanceof PloiProvider ? $provider->getApiKey() : '',
+                    $serverId,
+                    $siteId,
+                    $project,
+                    $profile,
+                );
+                if (! $envResult['success']) {
+                    $errorMsg = 'Environment variable configuration failed';
+                    if (isset($envResult['message']) && \is_string($envResult['message'])) {
+                        $errorMsg = $envResult['message'];
                     }
 
                     return [
