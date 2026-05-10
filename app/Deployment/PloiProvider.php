@@ -533,6 +533,14 @@ final class PloiProvider extends AbstractDeploymentProvider
         return $this->lastSiteId;
     }
 
+    public function getApiKey(): string
+    {
+        $apiKey = $this->config['api_key'] ?? '';
+        \assert(\is_string($apiKey));
+
+        return $apiKey;
+    }
+
     /**
      * Interpolate database name with project and profile placeholders.
      * Also interpolates any remaining environment variables.

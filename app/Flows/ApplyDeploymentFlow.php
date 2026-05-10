@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Flows;
 
+use App\Actions\ApplyAliasAction;
 use App\Actions\CreateDeploymentPlanAction;
 use App\Actions\ExecuteDeploymentAction;
 use App\Actions\GetDeploymentLogsAction;
@@ -111,16 +112,45 @@ final class ApplyDeploymentFlow
     ): array {
         $deployAction = new ExecuteDeploymentAction;
         $logsAction = new GetDeploymentLogsAction;
+        $aliasAction = new ApplyAliasAction;
 
         $result = $deployAction->handle($provider, $project, $profile);
 
         $logs = [];
+        $serverId = 0;
+        $siteId = 0;
+
         if ($provider instanceof PloiProvider) {
             $serverIdValue = $plan['server_id'] ?? 0;
             \assert(\is_int($serverIdValue) || \is_string($serverIdValue) || \is_numeric($serverIdValue));
             $serverId = \is_int($serverIdValue) ? $serverIdValue : (int) $serverIdValue;
             $siteId = $provider->getLastSiteId();
             $logs = $logsAction->handle($provider, $serverId, $siteId);
+        }
+
+        if ($result && $serverId > 0 && $siteId > 0) {
+            $aliases = $profile->aliases();
+            if ($aliases !== []) {
+                $aliasResult = $aliasAction->handle(
+                    $provider->getName(),
+                    $provider instanceof PloiProvider ? $provider->getApiKey() : '',
+                    $serverId,
+                    $siteId,
+                    $project,
+                    $profile,
+                );
+                if (! $aliasResult['success']) {
+                    $errorMsg = 'Alias configuration failed';
+                if (isset($aliasResult['message']) && \is_string($aliasResult['message'])) {
+                    $errorMsg = $aliasResult['message'];
+                }
+                return [
+                    'success' => false,
+                    'logs' => $logs,
+                    'error_message' => $errorMsg,
+                ];
+                }
+            }
         }
 
         return [
