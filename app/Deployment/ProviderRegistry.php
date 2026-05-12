@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Deployment;
 
+use App\Deployment\Providers\Cpanel\CpanelProvider;
 use App\Deployment\Providers\Forge\ForgeProvider;
 
 final class ProviderRegistry
@@ -12,6 +13,7 @@ final class ProviderRegistry
     private static array $providers = [
         'ploi' => PloiProvider::class,
         'forge' => ForgeProvider::class,
+        'cpanel' => CpanelProvider::class,
     ];
 
     public static function register(string $name, string $className): void

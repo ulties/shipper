@@ -17,8 +17,11 @@ final class ForgeProvider extends AbstractDeploymentProvider
     private string $lastError = '';
 
     private ?ForgeAliasManager $aliasManager = null;
+
     private ?ForgeDeployScriptManager $deployScriptManager = null;
+
     private ?ForgeEnvironmentManager $environmentManager = null;
+
     private ?ForgeSslManager $sslManager = null;
 
     public function getName(): string
